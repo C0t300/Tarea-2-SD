@@ -1,0 +1,19 @@
+syntax = "proto3";
+package comms;
+
+option go_package = "./;comms";
+
+message JugadorJuego1 {
+  int32 escogidoJugador = 1; // debe estar entre 1 y 10
+}
+
+message EstadoJuego {
+  bool vivo = 1; // define si murio
+  int32 escogidoLider = 2; // entre 6 y 10
+  bool win = 3; // define si gano
+  int32 round = 4;
+}
+
+service Juego1 {
+  rpc Jugada1(JugadorJuego1) returns (EstadoJuego) {}
+}
