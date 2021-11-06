@@ -99,3 +99,211 @@ var Juego1_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "comms.proto",
 }
+
+// MensajeDataLiderClient is the client API for MensajeDataLider service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type MensajeDataLiderClient interface {
+	Jugada(ctx context.Context, in *JugadaDataNode, opts ...grpc.CallOption) (*Empty, error)
+	HistorialJugador(ctx context.Context, in *Jugador, opts ...grpc.CallOption) (*HistorialJugadas, error)
+}
+
+type mensajeDataLiderClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewMensajeDataLiderClient(cc grpc.ClientConnInterface) MensajeDataLiderClient {
+	return &mensajeDataLiderClient{cc}
+}
+
+func (c *mensajeDataLiderClient) Jugada(ctx context.Context, in *JugadaDataNode, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/comms.MensajeDataLider/Jugada", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mensajeDataLiderClient) HistorialJugador(ctx context.Context, in *Jugador, opts ...grpc.CallOption) (*HistorialJugadas, error) {
+	out := new(HistorialJugadas)
+	err := c.cc.Invoke(ctx, "/comms.MensajeDataLider/HistorialJugador", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// MensajeDataLiderServer is the server API for MensajeDataLider service.
+// All implementations must embed UnimplementedMensajeDataLiderServer
+// for forward compatibility
+type MensajeDataLiderServer interface {
+	Jugada(context.Context, *JugadaDataNode) (*Empty, error)
+	HistorialJugador(context.Context, *Jugador) (*HistorialJugadas, error)
+	mustEmbedUnimplementedMensajeDataLiderServer()
+}
+
+// UnimplementedMensajeDataLiderServer must be embedded to have forward compatible implementations.
+type UnimplementedMensajeDataLiderServer struct {
+}
+
+func (UnimplementedMensajeDataLiderServer) Jugada(context.Context, *JugadaDataNode) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Jugada not implemented")
+}
+func (UnimplementedMensajeDataLiderServer) HistorialJugador(context.Context, *Jugador) (*HistorialJugadas, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HistorialJugador not implemented")
+}
+func (UnimplementedMensajeDataLiderServer) mustEmbedUnimplementedMensajeDataLiderServer() {}
+
+// UnsafeMensajeDataLiderServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to MensajeDataLiderServer will
+// result in compilation errors.
+type UnsafeMensajeDataLiderServer interface {
+	mustEmbedUnimplementedMensajeDataLiderServer()
+}
+
+func RegisterMensajeDataLiderServer(s grpc.ServiceRegistrar, srv MensajeDataLiderServer) {
+	s.RegisterService(&MensajeDataLider_ServiceDesc, srv)
+}
+
+func _MensajeDataLider_Jugada_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JugadaDataNode)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MensajeDataLiderServer).Jugada(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/comms.MensajeDataLider/Jugada",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MensajeDataLiderServer).Jugada(ctx, req.(*JugadaDataNode))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MensajeDataLider_HistorialJugador_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Jugador)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MensajeDataLiderServer).HistorialJugador(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/comms.MensajeDataLider/HistorialJugador",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MensajeDataLiderServer).HistorialJugador(ctx, req.(*Jugador))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// MensajeDataLider_ServiceDesc is the grpc.ServiceDesc for MensajeDataLider service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var MensajeDataLider_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "comms.MensajeDataLider",
+	HandlerType: (*MensajeDataLiderServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Jugada",
+			Handler:    _MensajeDataLider_Jugada_Handler,
+		},
+		{
+			MethodName: "HistorialJugador",
+			Handler:    _MensajeDataLider_HistorialJugador_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "comms.proto",
+}
+
+// PozoClient is the client API for Pozo service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type PozoClient interface {
+	PedidoPozo(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*MontoAcumulado, error)
+}
+
+type pozoClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewPozoClient(cc grpc.ClientConnInterface) PozoClient {
+	return &pozoClient{cc}
+}
+
+func (c *pozoClient) PedidoPozo(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*MontoAcumulado, error) {
+	out := new(MontoAcumulado)
+	err := c.cc.Invoke(ctx, "/comms.Pozo/PedidoPozo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// PozoServer is the server API for Pozo service.
+// All implementations must embed UnimplementedPozoServer
+// for forward compatibility
+type PozoServer interface {
+	PedidoPozo(context.Context, *Empty) (*MontoAcumulado, error)
+	mustEmbedUnimplementedPozoServer()
+}
+
+// UnimplementedPozoServer must be embedded to have forward compatible implementations.
+type UnimplementedPozoServer struct {
+}
+
+func (UnimplementedPozoServer) PedidoPozo(context.Context, *Empty) (*MontoAcumulado, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PedidoPozo not implemented")
+}
+func (UnimplementedPozoServer) mustEmbedUnimplementedPozoServer() {}
+
+// UnsafePozoServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PozoServer will
+// result in compilation errors.
+type UnsafePozoServer interface {
+	mustEmbedUnimplementedPozoServer()
+}
+
+func RegisterPozoServer(s grpc.ServiceRegistrar, srv PozoServer) {
+	s.RegisterService(&Pozo_ServiceDesc, srv)
+}
+
+func _Pozo_PedidoPozo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PozoServer).PedidoPozo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/comms.Pozo/PedidoPozo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PozoServer).PedidoPozo(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Pozo_ServiceDesc is the grpc.ServiceDesc for Pozo service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Pozo_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "comms.Pozo",
+	HandlerType: (*PozoServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "PedidoPozo",
+			Handler:    _Pozo_PedidoPozo_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "comms.proto",
+}
