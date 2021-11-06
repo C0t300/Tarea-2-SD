@@ -3,13 +3,12 @@ package main
 import (
 	"log"
 
-	"../comms"
+	pb "../comms"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
-func main() {
-
+func connectGRPC() pb.Juego1Client {
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(":9000", grpc.WithInsecure())
 	if err != nil {
@@ -17,12 +16,21 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := comms.NewJuego1Client(conn)
+	c := pb.NewJuego1Client(conn)
+	return c
+}
 
-	response, err := c.Jugada1(context.Background(), &comms.JugadorJuego1{EscogidoJugador: 1})
+func QuieroJugarJugador(c pb.Juego1Client) int {
+	response, err := c.QuieroJugar(context.Background(), &pb.Empty{})
 	if err != nil {
 		log.Fatalf("Error when calling SayHello: %s", err)
 	}
-	log.Printf("Response from server: %d", response.EscogidoLider)
+	return int(response.NumJug)
+}
+
+func main() {
+
+	c := connectGRPC()
+	nJugador := QuieroJugarJugador(c)
 
 }

@@ -4,38 +4,40 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
 	"net"
+	"os"
+	"strconv"
 
 	pb "../comms"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
-	pb.UnimplementedJuego1Server
+	pb.UnimplementedDataNodeServer
 }
 
-func (s *Server) Jugada1(ctx context.Context, jugadorJuego1 *pb.JugadorJuego1) (*pb.EstadoJuego, error) {
-	nEsc := int(jugadorJuego1.EscogidoJugador)
-	log.Printf("Recibido jugada, escogio el numero: %d", nEsc)
-	nLider := rand.Intn(5) + 6
-	dead := false
-	if nLider >= nEsc {
-		dead = true
+func (s *Server) GuardarDatos(ctx context.Context, jugadaDataNode *pb.JugadaDataNode) (*pb.Empty, error) {
+	nJug := strconv.Itoa(int(jugadaDataNode.Jugador))
+	nRon := strconv.Itoa(int(jugadaDataNode.Ronda))
+	juga := strconv.Itoa(int(jugadaDataNode.Jugada))
+	//log.Printf("Recibido jugada, escogio el numero: %d", nEsc)
+	frase := ("jugador_") + nJug + ("__ronda_") + nRon
+	f, err := os.Create(frase + ".txt")
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	return &pb.EstadoJuego{Vivo: dead, EscogidoLider: int32(nLider), Win: false, Round: int32(1)}, nil
+	defer f.Close()
+
+	_, err2 := f.WriteString(juga + "\n")
+
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+	fmt.Println("done")
+	return &pb.Empty{}, nil
 }
-
-/* func juego1() {
-	ronda := 1
-	// jugadores :=
-	for ronda < 5 {
-		nLider := rand.Intn(5) + 6
-		ronda = ronda + 1
-
-	}
-} */
 
 func main() {
 
@@ -43,14 +45,20 @@ func main() {
 
 	fmt.Println("Soy el Lider!")
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9000))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9005))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		lis, err = net.Listen("tcp", fmt.Sprintf(":%d", 9006))
+		if err != nil {
+			lis, err = net.Listen("tcp", fmt.Sprintf(":%d", 9007))
+			if err != nil {
+				log.Fatalf("failed to listen: %v", err)
+			}
+		}
 	}
 
 	s := grpc.NewServer()
 
-	pb.RegisterJuego1Server(s, &Server{})
+	pb.RegisterDataNodeServer(s, &Server{})
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %s", err)

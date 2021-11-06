@@ -16,10 +16,17 @@ type Server struct {
 	pb.UnimplementedJuego1Server
 }
 
+var Vivos int32
+
 func failOnError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
 	}
+}
+
+func (s *Server) QuieroJugar(ctx context.Context, empty *pb.Empty) (*pb.Jugador, error) {
+	Vivos += 1
+	return &pb.Jugador{NumJug: int32(Vivos)}, nil
 }
 
 func (s *Server) Jugada1(ctx context.Context, jugadorJuego1 *pb.JugadorJuego1) (*pb.EstadoJuego, error) {
@@ -34,7 +41,7 @@ func (s *Server) Jugada1(ctx context.Context, jugadorJuego1 *pb.JugadorJuego1) (
 	return &pb.EstadoJuego{Vivo: dead, EscogidoLider: int32(nLider), Win: false, Round: int32(1)}, nil
 }
 
-func openRMQ() {
+func openRMQ() (amqp.Queue, error, *amqp.Channel) {
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
@@ -52,7 +59,10 @@ func openRMQ() {
 		nil,     // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
+	return q, err, ch
+}
 
+func sendJugadorEliminadoPozo(q amqp.Queue, err error, ch *amqp.Channel, nJugador int, nRonda int) {
 	body := "Hello World!"
 	err = ch.Publish(
 		"",     // exchange
@@ -67,13 +77,13 @@ func openRMQ() {
 	log.Printf(" [x] Sent %s", body)
 }
 
-//func sendJugadorEliminadoPozo()
-
 func main() {
 
 	fmt.Println("Soy el Lider!")
-
-	//openRMQ()
+	Vivos = 0
+	//q, errr, ch := openRMQ()
+	// Estas variables se usan cada vez que se elimina alguien
+	// Se debe llamar a sendJugadorEliminadoPozo()
 
 	//parte cliente Lider-nameNode
 	var conn *grpc.ClientConn

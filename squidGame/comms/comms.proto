@@ -28,12 +28,16 @@ message Jugador{
   int32 numJug=1;
 }
 
+message JugadorRonda{
+  int32 Jugador=1;
+  int32 Ronda=2;
+}
+
 message HistorialJugadas{
   int32 jugador=1;
   repeated int32 ronda1=2;
-  repeated int32 ronda2=3;
-  repeated int32 ronda3=4;
-  int32 jugada=5;
+  int32 ronda2=3;
+  int32 ronda3=4;
 }
 
 message Empty {
@@ -42,6 +46,7 @@ message Empty {
 
 service Juego1 {
   rpc Jugada1(JugadorJuego1) returns (EstadoJuego) {}
+  rpc QuieroJugar(Empty) returns (Jugador) {}
 }
 
 service MensajeDataLider{
@@ -51,4 +56,9 @@ service MensajeDataLider{
 
 service Pozo {
   rpc PedidoPozo(Empty) returns (MontoAcumulado) {}
+}
+
+service DataNode {
+  rpc GuardarDatos(JugadaDataNode) returns (Empty) {}
+  rpc PedirDatos(JugadorRonda) returns (Empty) {}
 }

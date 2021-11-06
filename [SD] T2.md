@@ -60,8 +60,11 @@ protoc --go-grpc_out=. comms.proto
 
 ## Puertos
 
-- Pozo :9002
+- Pozo :9002 gRPC
+- Pozo :5672 rMQ
 - lider-namenode 9001
+- datanodes 9005-7
+- lider - jugador 9003
 
 ## Paginas útiles
 
