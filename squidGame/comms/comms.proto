@@ -3,11 +3,12 @@ package comms;
 
 option go_package = "./;comms";
 
-message JugadorJuego1 {
+message JugadorEtapa1 {
   int32 escogidoJugador = 1; // debe estar entre 1 y 10
+  int32 numJug = 2;
 }
 
-message EstadoJuego {
+message EstadoEtapa1 {
   bool vivo = 1; // define si murio
   int32 escogidoLider = 2; // entre 6 y 10
   bool win = 3; // define si gano
@@ -28,16 +29,19 @@ message Jugador{
   int32 numJug=1;
 }
 
-message JugadorRonda{
-  int32 Jugador=1;
-  int32 Ronda=2;
+message JugadorEtapa{
+  int32 jugador=1;
+  int32 etapa=2;
 }
 
 message HistorialJugadas{
   int32 jugador=1;
-  repeated int32 ronda1=2;
+  int32 ronda1=2;
   int32 ronda2=3;
   int32 ronda3=4;
+  int32 ronda4=5;
+  int32 etapa2=6;
+  int32 etapa3=7;
 }
 
 message Empty {
@@ -45,7 +49,7 @@ message Empty {
 }
 
 service Juego1 {
-  rpc Jugada1(JugadorJuego1) returns (EstadoJuego) {}
+  rpc Etapa1(JugadorEtapa1) returns (EstadoEtapa1) {}
   rpc QuieroJugar(Empty) returns (Jugador) {}
 }
 
@@ -60,5 +64,5 @@ service Pozo {
 
 service DataNode {
   rpc GuardarDatos(JugadaDataNode) returns (Empty) {}
-  rpc PedirDatos(JugadorRonda) returns (Empty) {}
+  rpc PedirDatos(JugadorEtapa) returns (HistorialJugadas) {}
 }

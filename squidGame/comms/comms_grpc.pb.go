@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type Juego1Client interface {
-	Jugada1(ctx context.Context, in *JugadorJuego1, opts ...grpc.CallOption) (*EstadoJuego, error)
+	Etapa1(ctx context.Context, in *JugadorEtapa1, opts ...grpc.CallOption) (*EstadoEtapa1, error)
 	QuieroJugar(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Jugador, error)
 }
 
@@ -30,9 +30,9 @@ func NewJuego1Client(cc grpc.ClientConnInterface) Juego1Client {
 	return &juego1Client{cc}
 }
 
-func (c *juego1Client) Jugada1(ctx context.Context, in *JugadorJuego1, opts ...grpc.CallOption) (*EstadoJuego, error) {
-	out := new(EstadoJuego)
-	err := c.cc.Invoke(ctx, "/comms.Juego1/Jugada1", in, out, opts...)
+func (c *juego1Client) Etapa1(ctx context.Context, in *JugadorEtapa1, opts ...grpc.CallOption) (*EstadoEtapa1, error) {
+	out := new(EstadoEtapa1)
+	err := c.cc.Invoke(ctx, "/comms.Juego1/Etapa1", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *juego1Client) QuieroJugar(ctx context.Context, in *Empty, opts ...grpc.
 // All implementations must embed UnimplementedJuego1Server
 // for forward compatibility
 type Juego1Server interface {
-	Jugada1(context.Context, *JugadorJuego1) (*EstadoJuego, error)
+	Etapa1(context.Context, *JugadorEtapa1) (*EstadoEtapa1, error)
 	QuieroJugar(context.Context, *Empty) (*Jugador, error)
 	mustEmbedUnimplementedJuego1Server()
 }
@@ -61,8 +61,8 @@ type Juego1Server interface {
 type UnimplementedJuego1Server struct {
 }
 
-func (UnimplementedJuego1Server) Jugada1(context.Context, *JugadorJuego1) (*EstadoJuego, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Jugada1 not implemented")
+func (UnimplementedJuego1Server) Etapa1(context.Context, *JugadorEtapa1) (*EstadoEtapa1, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Etapa1 not implemented")
 }
 func (UnimplementedJuego1Server) QuieroJugar(context.Context, *Empty) (*Jugador, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QuieroJugar not implemented")
@@ -80,20 +80,20 @@ func RegisterJuego1Server(s grpc.ServiceRegistrar, srv Juego1Server) {
 	s.RegisterService(&Juego1_ServiceDesc, srv)
 }
 
-func _Juego1_Jugada1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(JugadorJuego1)
+func _Juego1_Etapa1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JugadorEtapa1)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(Juego1Server).Jugada1(ctx, in)
+		return srv.(Juego1Server).Etapa1(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/comms.Juego1/Jugada1",
+		FullMethod: "/comms.Juego1/Etapa1",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(Juego1Server).Jugada1(ctx, req.(*JugadorJuego1))
+		return srv.(Juego1Server).Etapa1(ctx, req.(*JugadorEtapa1))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -124,8 +124,8 @@ var Juego1_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*Juego1Server)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Jugada1",
-			Handler:    _Juego1_Jugada1_Handler,
+			MethodName: "Etapa1",
+			Handler:    _Juego1_Etapa1_Handler,
 		},
 		{
 			MethodName: "QuieroJugar",
@@ -349,7 +349,7 @@ var Pozo_ServiceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DataNodeClient interface {
 	GuardarDatos(ctx context.Context, in *JugadaDataNode, opts ...grpc.CallOption) (*Empty, error)
-	PedirDatos(ctx context.Context, in *JugadorRonda, opts ...grpc.CallOption) (*Empty, error)
+	PedirDatos(ctx context.Context, in *JugadorEtapa, opts ...grpc.CallOption) (*HistorialJugadas, error)
 }
 
 type dataNodeClient struct {
@@ -369,8 +369,8 @@ func (c *dataNodeClient) GuardarDatos(ctx context.Context, in *JugadaDataNode, o
 	return out, nil
 }
 
-func (c *dataNodeClient) PedirDatos(ctx context.Context, in *JugadorRonda, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *dataNodeClient) PedirDatos(ctx context.Context, in *JugadorEtapa, opts ...grpc.CallOption) (*HistorialJugadas, error) {
+	out := new(HistorialJugadas)
 	err := c.cc.Invoke(ctx, "/comms.DataNode/PedirDatos", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -383,7 +383,7 @@ func (c *dataNodeClient) PedirDatos(ctx context.Context, in *JugadorRonda, opts 
 // for forward compatibility
 type DataNodeServer interface {
 	GuardarDatos(context.Context, *JugadaDataNode) (*Empty, error)
-	PedirDatos(context.Context, *JugadorRonda) (*Empty, error)
+	PedirDatos(context.Context, *JugadorEtapa) (*HistorialJugadas, error)
 	mustEmbedUnimplementedDataNodeServer()
 }
 
@@ -394,7 +394,7 @@ type UnimplementedDataNodeServer struct {
 func (UnimplementedDataNodeServer) GuardarDatos(context.Context, *JugadaDataNode) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GuardarDatos not implemented")
 }
-func (UnimplementedDataNodeServer) PedirDatos(context.Context, *JugadorRonda) (*Empty, error) {
+func (UnimplementedDataNodeServer) PedirDatos(context.Context, *JugadorEtapa) (*HistorialJugadas, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PedirDatos not implemented")
 }
 func (UnimplementedDataNodeServer) mustEmbedUnimplementedDataNodeServer() {}
@@ -429,7 +429,7 @@ func _DataNode_GuardarDatos_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _DataNode_PedirDatos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(JugadorRonda)
+	in := new(JugadorEtapa)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -441,7 +441,7 @@ func _DataNode_PedirDatos_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/comms.DataNode/PedirDatos",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DataNodeServer).PedirDatos(ctx, req.(*JugadorRonda))
+		return srv.(DataNodeServer).PedirDatos(ctx, req.(*JugadorEtapa))
 	}
 	return interceptor(ctx, in, info, handler)
 }

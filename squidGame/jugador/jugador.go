@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	pb "../comms"
@@ -21,6 +22,7 @@ func connectGRPC() pb.Juego1Client {
 }
 
 func QuieroJugarJugador(c pb.Juego1Client) int {
+	fmt.Printf("Enviada solicitud de juego.")
 	response, err := c.QuieroJugar(context.Background(), &pb.Empty{})
 	if err != nil {
 		log.Fatalf("Error when calling SayHello: %s", err)
@@ -32,5 +34,6 @@ func main() {
 
 	c := connectGRPC()
 	nJugador := QuieroJugarJugador(c)
+	fmt.Printf("Juego iniciado. Jugador numero: %d", nJugador)
 
 }
