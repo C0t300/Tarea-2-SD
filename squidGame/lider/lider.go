@@ -73,7 +73,7 @@ func main() {
 
 	fmt.Println("Soy el Lider!")
 
-	openRMQ()
+	//openRMQ()
 
 	//parte cliente Lider-nameNode
 	var conn *grpc.ClientConn
@@ -86,10 +86,11 @@ func main() {
 	c := pb.NewMensajeDataLiderClient(conn)
 
 	response, err := c.Jugada(context.Background(), &pb.JugadaDataNode{Jugador: 1, Ronda: 1, Jugada: 1})
+	_ = response
 	if err != nil {
 		log.Fatalf("Error when calling nameNode: %s", err)
 	}
-	log.Printf("Respuesta desde nameNode: %d", response.EscogidoLider)
+	log.Printf("Respuesta desde nameNode.")
 	//parte Servidor Lider-Jugadores
 	//cantRondasJuego1 := 1
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9000))
