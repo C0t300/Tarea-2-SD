@@ -27,7 +27,7 @@ func (s *Server) Jugada1(ctx context.Context, jugadorJuego1 *pb.JugadorJuego1) (
 	return &pb.EstadoJuego{Vivo: dead, EscogidoLider: int32(nLider), Win: false, Round: int32(1)}, nil
 }
 
-func juego1() {
+/* func juego1() {
 	ronda := 1
 	// jugadores :=
 	for ronda < 5 {
@@ -35,11 +35,11 @@ func juego1() {
 		ronda = ronda + 1
 
 	}
-}
+} */
 
 func main() {
 
-	cantRondasJuego1 := 1
+	//cantRondasJuego1 := 1
 
 	fmt.Println("Soy el Lider!")
 
