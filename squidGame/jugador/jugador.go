@@ -17,7 +17,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := comms.NewChatServiceClient(conn)
+	c := comms.NewJuego1Client(conn)
 
 	response, err := c.Jugada1(context.Background(), &comms.JugadorJuego1{EscogidoJugador: 1})
 	if err != nil {
