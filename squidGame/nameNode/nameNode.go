@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"../comms"
+	pb "../comms"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -16,9 +16,9 @@ type Server struct {
 	pb.UnimplementedMensajeDataLiderServer
 }
 
-func (s *Server) Jugada(ctx context.Context, jugadaDataNode *pb.JugadaDataNode) {
-	nJug := strconv.Itoa(jugadaDataNode.Jugador)
-	nRon := strconv.Itoa(jugadaDataNode.ronda)
+func (s *Server) Jugada(ctx context.Context, jugadaDataNode *pb.JugadaDataNode) (*pb.Empty, error) {
+	nJug := strconv.Itoa(int(jugadaDataNode.Jugador))
+	nRon := strconv.Itoa(int(jugadaDataNode.Ronda))
 	//log.Printf("Recibido jugada, escogio el numero: %d", nEsc)
 	frase := ("Jugador_") + nJug + (" Ronda_") + nRon
 	f, err := os.Create("NameNodeData.txt")
@@ -34,12 +34,13 @@ func (s *Server) Jugada(ctx context.Context, jugadaDataNode *pb.JugadaDataNode) 
 	if err2 != nil {
 		log.Fatal(err2)
 	}
-
-	return &comms.Empty{}
+	fmt.Println("done")
+	return &pb.Empty{}, nil
 }
 
 func main() {
 
+	fmt.Println("nameNode arriba")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9001))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
