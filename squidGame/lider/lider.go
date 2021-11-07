@@ -109,6 +109,7 @@ func getHistorialJugador(nJug int) (int, int, int, int, int, int, int) {
 	if err != nil {
 		log.Fatalf("Error when calling nameNode: %s", err)
 	}
+	fmt.Println("response ronda 1", response.Ronda1)
 	return int(response.Jugador), int(response.Ronda1), int(response.Ronda2), int(response.Ronda3), int(response.Ronda4), int(response.Etapa2), int(response.Etapa3)
 }
 
@@ -130,11 +131,11 @@ func (s *Server) Etapa1(ctx context.Context, jugadorEtapa1 *pb.JugadorEtapa1) (*
 	log.Printf("Recibido jugada, escogio el numero: %d", nEsc)
 	nLider := rand.Intn(5) + 6
 	alive := true
-	if nLider >= nEsc {
+	if nLider <= nEsc {
 		alive = false
 		win = false
 	}
-	enviarDatosJugada(numJug, 0, nEsc)
+	enviarDatosJugada(numJug, nRonda, nEsc)
 
 	if nRonda >= 4 && suma < 21 {
 		alive = false

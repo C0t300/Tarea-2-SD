@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	pb "../comms"
 	"golang.org/x/net/context"
@@ -54,8 +55,8 @@ func etapa1(nJug int) (bool, bool) { // keep loop and win
 	fmt.Println("Ingrese numero para Luz Roja, Luz Verde.")
 	fmt.Print("Recuerde que debe ser entre 1 y 10: ")
 	text, _ := reader.ReadString('\n')
-	fmt.Println(text)
-	num, _ := strconv.Atoi(text)
+	text = strings.Replace(text, "\n", "", -1)
+	num, _ := strconv.Atoi(string(text))
 
 	response, err := c.Etapa1(context.Background(), &pb.JugadorEtapa1{EscogidoJugador: int32(num), NumJug: int32(nJug)})
 	if err != nil {

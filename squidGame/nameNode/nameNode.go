@@ -24,7 +24,8 @@ var dn3 pb.DataNodeClient
 
 var l1 [][2]int
 var l2 [][2]int
-var l3 [][2]int
+
+/* var l3 [][2]int */
 
 var ip1 string
 var ip2 string
@@ -46,13 +47,13 @@ func (s *Server) Jugada(ctx context.Context, jugadaDataNode *pb.JugadaDataNode) 
 	var ip string
 
 	if enLista(int(jugadaDataNode.Jugador), int(jugadaDataNode.Ronda), l1) {
-		EnviarDatos(dn1, *jugadaDataNode)
+		EnviarDatos(dn1, jugadaDataNode)
 		ip = ip1
 	} else if enLista(int(jugadaDataNode.Jugador), int(jugadaDataNode.Ronda), l2) {
-		EnviarDatos(dn2, *jugadaDataNode)
+		EnviarDatos(dn2, jugadaDataNode)
 		ip = ip2
 	} else {
-		EnviarDatos(dn3, *jugadaDataNode)
+		EnviarDatos(dn3, jugadaDataNode)
 		ip = ip3
 	}
 	frase := ("Jugador_") + nJug + (" Ronda_") + nRon + " " + ip
@@ -98,6 +99,7 @@ func (s *Server) HistorialJugador(ctx context.Context, jugador *pb.Jugador) (*pb
 	} else {
 		ronda1, _ = dn3.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 1})
 	}
+	fmt.Println(ronda1)
 	/* if enLista(int(jugador.NumJug), 1, l1) {
 		ronda1, err = dn1.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 2})
 	} else if enLista(int(jugador.NumJug), 1, l2) {
@@ -127,7 +129,7 @@ func (s *Server) HistorialJugador(ctx context.Context, jugador *pb.Jugador) (*pb
 		int32 etapa3=7;
 	  } */
 
-	return &pb.HistorialJugadas{Jugador: int32(jugador.NumJug), Ronda1: int32(ronda1.Ronda1), Ronda2: int32(ronda1.Ronda2), Ronda3: int32(ronda1.Ronda3), Ronda4: int32(ronda1.Ronda4), Etapa2: 0, Etapa3: 0}, nil
+	return ronda1, nil //pb.HistorialJugadas{Jugador: int32(jugador.NumJug), Ronda1: int32(ronda1.Ronda1), Ronda2: int32(ronda1.Ronda2), Ronda3: int32(ronda1.Ronda3), Ronda4: int32(ronda1.Ronda4), Etapa2: 0, Etapa3: 0}, nil
 }
 
 func connectGRPC(puerto string) pb.DataNodeClient {
@@ -142,9 +144,9 @@ func connectGRPC(puerto string) pb.DataNodeClient {
 	return c
 }
 
-func EnviarDatos(c pb.DataNodeClient, datos pb.JugadaDataNode) {
+func EnviarDatos(c pb.DataNodeClient, datos *pb.JugadaDataNode) {
 	fmt.Printf("Jugada enviada al DataNode.")
-	response, err := c.GuardarDatos(context.Background(), &datos)
+	response, err := c.GuardarDatos(context.Background(), datos)
 	_ = response
 	if err != nil {
 		log.Fatalf("Error when calling GuardarDatos: %s", err)
@@ -157,7 +159,7 @@ func Shuffle() {
 	rand.Shuffle(len(lista), func(i, j int) { lista[i], lista[j] = lista[j], lista[i] })
 	l1 = lista[0:16]
 	l2 = lista[17:32]
-	l3 = lista[33:48]
+	/* l3 = lista[33:48] */
 }
 
 func main() {
@@ -171,9 +173,34 @@ func main() {
 	ip1 = ""
 	ip2 = ""
 	ip3 = ""
-	dn1 = connectGRPC(ip1 + ":9005")
-	dn2 = connectGRPC(ip2 + ":9006")
-	dn3 = connectGRPC(ip3 + ":9007")
+
+	var conn *grpc.ClientConn
+	conn, err = grpc.Dial(":9007", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("No Conectado a %s: %s", ":9007", err)
+	}
+	defer conn.Close()
+
+	dn1 = pb.NewDataNodeClient(conn)
+	//dn1 = connectGRPC(ip1 + ":9005")
+
+	conn, err = grpc.Dial(":9005", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("No Conectado a %s: %s", ":9005", err)
+	}
+	defer conn.Close()
+
+	dn2 = pb.NewDataNodeClient(conn)
+	//dn2 = connectGRPC(ip2 + ":9006")
+
+	conn, err = grpc.Dial(":9006", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("No Conectado a %s: %s", ":9006", err)
+	}
+	defer conn.Close()
+
+	dn3 = pb.NewDataNodeClient(conn)
+	//dn3 = connectGRPC(ip3 + ":9007")
 	s := grpc.NewServer()
 
 	pb.RegisterMensajeDataLiderServer(s, &Server{})
