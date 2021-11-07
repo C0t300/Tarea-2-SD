@@ -129,18 +129,23 @@ func (s *Server) Etapa1(ctx context.Context, jugadorEtapa1 *pb.JugadorEtapa1) (*
 
 	log.Printf("Recibido jugada, escogio el numero: %d", nEsc)
 	nLider := rand.Intn(5) + 6
-	dead := false
+	alive := true
 	if nLider >= nEsc {
-		dead = true
+		alive = false
 		win = false
 	}
 	enviarDatosJugada(numJug, 0, nEsc)
 
-	if dead {
+	if nRonda >= 4 && suma < 21 {
+		alive = false
+		win = false
+	}
+
+	if !alive {
 		sendJugadorEliminadoPozo(numJug, nRonda)
 	}
 
-	return &pb.EstadoEtapa1{Vivo: dead, EscogidoLider: int32(nLider), Win: win, Round: int32(nRonda)}, nil
+	return &pb.EstadoEtapa1{Vivo: alive, EscogidoLider: int32(nLider), Win: win, Round: int32(nRonda)}, nil
 }
 
 func main() {
@@ -154,7 +159,7 @@ func main() {
 	//parte cliente Lider-nameNode
 	//parte Servidor Lider-Jugadores
 	//cantRondasJuego1 := 1
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9000))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9003))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
