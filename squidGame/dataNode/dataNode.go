@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -60,7 +61,7 @@ func fileExists(nombreArchivo string) bool {
 /*Lectura de Archivos*/
 func readFile(nombreArchivo string) []string {
 	if fileExists(nombreArchivo) {
-		content, err := os.ReadFile(nombreArchivo)
+		content, err := ioutil.ReadFile(nombreArchivo)
 		if err != nil {
 			fmt.Println(err.Error())
 			fmt.Println("err 2")
