@@ -31,6 +31,7 @@ var ip1 string
 var ip2 string
 var ip3 string
 
+//Función que verifica la ronda del jugador se encuentra en la lista de un dataNode
 func enLista(jugador int, ronda int, lista [][2]int) bool {
 	encontrar := [2]int{jugador, ronda}
 	for _, valores := range lista {
@@ -41,6 +42,7 @@ func enLista(jugador int, ronda int, lista [][2]int) bool {
 	return false
 }
 
+//Obtiene la jugada realizada y la envía al dataNode correspondiente
 func (s *Server) Jugada(ctx context.Context, jugadaDataNode *pb.JugadaDataNode) (*pb.Empty, error) {
 	nJug := strconv.Itoa(int(jugadaDataNode.Jugador))
 	nRon := strconv.Itoa(int(jugadaDataNode.Ronda))
@@ -74,6 +76,7 @@ func (s *Server) Jugada(ctx context.Context, jugadaDataNode *pb.JugadaDataNode) 
 	return &pb.Empty{}, nil
 }
 
+//Función que dado un jugador retorna su historial de jugadas
 func (s *Server) HistorialJugador(ctx context.Context, jugador *pb.Jugador) (*pb.HistorialJugadas, error) {
 	var ronda1 *pb.HistorialJugadas
 	/* var ronda2 pb.HistorialJugadas
@@ -132,6 +135,7 @@ func (s *Server) HistorialJugador(ctx context.Context, jugador *pb.Jugador) (*pb
 	return ronda1, nil //pb.HistorialJugadas{Jugador: int32(jugador.NumJug), Ronda1: int32(ronda1.Ronda1), Ronda2: int32(ronda1.Ronda2), Ronda3: int32(ronda1.Ronda3), Ronda4: int32(ronda1.Ronda4), Etapa2: 0, Etapa3: 0}, nil
 }
 
+//Función para conectar con un dataNode
 func connectGRPC(puerto string) pb.DataNodeClient {
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(puerto, grpc.WithInsecure())
@@ -144,6 +148,7 @@ func connectGRPC(puerto string) pb.DataNodeClient {
 	return c
 }
 
+//Envía la jugada realizadaa dataNode
 func EnviarDatos(c pb.DataNodeClient, datos *pb.JugadaDataNode) {
 	fmt.Printf("Jugada enviada al DataNode.")
 	response, err := c.GuardarDatos(context.Background(), datos)
@@ -153,6 +158,7 @@ func EnviarDatos(c pb.DataNodeClient, datos *pb.JugadaDataNode) {
 	}
 }
 
+//Aleatoriza y asigna las rondas de los jugadores a los distintos dataNodes
 func Shuffle() {
 	lista := [48][2]int{{1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}, {6, 1}, {7, 1}, {8, 1}, {9, 1}, {10, 1}, {11, 1}, {12, 1}, {13, 1}, {14, 1}, {15, 1}, {16, 1}, {1, 2}, {2, 2}, {3, 2}, {4, 2}, {5, 2}, {6, 2}, {7, 2}, {8, 2}, {9, 2}, {10, 2}, {11, 2}, {12, 2}, {13, 2}, {14, 2}, {15, 2}, {16, 2}, {1, 3}, {2, 3}, {3, 3}, {4, 3}, {5, 3}, {6, 3}, {7, 3}, {8, 3}, {9, 3}, {10, 3}, {11, 3}, {12, 3}, {13, 3}, {14, 3}, {15, 3}, {16, 3}}
 	rand.Seed(time.Now().Unix())
@@ -175,7 +181,7 @@ func main() {
 	ip3 = ""
 
 	var conn *grpc.ClientConn
-	conn, err = grpc.Dial(":9007", grpc.WithInsecure())
+	conn, err = grpc.Dial("10.6.40.230:9005", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("No Conectado a %s: %s", ":9007", err)
 	}
@@ -184,7 +190,7 @@ func main() {
 	dn1 = pb.NewDataNodeClient(conn)
 	//dn1 = connectGRPC(ip1 + ":9005")
 
-	conn, err = grpc.Dial(":9005", grpc.WithInsecure())
+	conn, err = grpc.Dial("10.6.40.231:9005", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("No Conectado a %s: %s", ":9005", err)
 	}
@@ -193,7 +199,7 @@ func main() {
 	dn2 = pb.NewDataNodeClient(conn)
 	//dn2 = connectGRPC(ip2 + ":9006")
 
-	conn, err = grpc.Dial(":9006", grpc.WithInsecure())
+	conn, err = grpc.Dial("10.6.40.233:9005", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("No Conectado a %s: %s", ":9006", err)
 	}

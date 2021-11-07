@@ -43,13 +43,19 @@ lider <-> pozo [grpc] [rmq]
 
 91: 10.6.40.232 [installed/tested gRPC and rMQ Server (docker)]
 
-92:  
+92: 10.6.40.233
 
 89 <-> 91 gRPC
 
 89 <-> 91 rMQ
 
 ## Compilar
+
+```bash
+go install google.golang.org/protobuf/cmd/protoc-gen-go
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+export PATH="$PATH:$(go env GOPATH)/bin"
+```
 
 ```bash
 protoc --go_out=. comms.proto

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -19,12 +20,14 @@ type Server struct {
 	pb.UnimplementedPozoServer
 }
 
+// Anexo para tratar errores
 func failOnError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
 	}
 }
 
+// Revisa si el archivo del pozo existe
 func fileExists() bool {
 	if _, err := os.Stat("pozo.txt"); err == nil {
 		return true
@@ -39,6 +42,7 @@ func fileExists() bool {
 	}
 }
 
+// Crea el archivo del pozo
 func createFile() {
 	myfile, err := os.Create("pozo.txt")
 	if err != nil {
@@ -48,6 +52,7 @@ func createFile() {
 	myfile.Close()
 }
 
+// AGrega un jugador eliminado al archivo pozo
 func addJugadorEliminado(nJugador int, nRonda int, prevMonto int) {
 	text := strconv.Itoa(nJugador) + " " + strconv.Itoa(nRonda) + " " + strconv.Itoa(prevMonto+100000000)
 	f, err := os.OpenFile("pozo.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
@@ -62,6 +67,7 @@ func addJugadorEliminado(nJugador int, nRonda int, prevMonto int) {
 	}
 }
 
+// Formatea los datos del archivo para entregarlos
 func parseJugadorEliminadoString(texto string) (int, int) {
 	separado := strings.Split(texto, " ")
 	nJugador, err := strconv.Atoi(separado[0])
@@ -81,9 +87,10 @@ func parseJugadorEliminadoString(texto string) (int, int) {
 	return nJugador, nRonda
 }
 
+// Obtiene pozo
 func getPozo() int {
 	if fileExists() {
-		content, err := os.ReadFile("pozo.txt")
+		content, err := ioutil.ReadFile("pozo.txt")
 		if err != nil {
 			fmt.Println(err.Error())
 			fmt.Println("err 2")
@@ -108,11 +115,13 @@ func getPozo() int {
 	return -1
 }
 
+// Maneja el pedido el pozo
 func (s *Server) PedidoPozo(ctx context.Context, empty *pb.Empty) (*pb.MontoAcumulado, error) {
 
 	return &pb.MontoAcumulado{Monto: int64(getPozo())}, nil
 }
 
+// Abre las conexiones para RPC
 func opengRPC() {
 	createFile()
 
@@ -130,8 +139,9 @@ func opengRPC() {
 	}
 }
 
+// ABre las conexiones para RMQ
 func openRMQ() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@10.6.40.231:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -174,6 +184,7 @@ func openRMQ() {
 	<-forever
 }
 
+// Main que corre todo
 func main() {
 
 	//cantRondasJuego1 := 1

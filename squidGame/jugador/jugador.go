@@ -25,9 +25,10 @@ import (
 	return c
 } */
 
+// Envia al lider una peticion para jugar
 func QuieroJugarJugador() int {
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":9003", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.6.40.231:9003", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %s", err)
 	}
@@ -44,7 +45,7 @@ func QuieroJugarJugador() int {
 
 func etapa1(nJug int) (bool, bool) { // keep loop and win
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":9003", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.6.40.231:9003", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %s", err)
 	}

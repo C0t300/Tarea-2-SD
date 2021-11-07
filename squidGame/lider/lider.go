@@ -19,12 +19,14 @@ type Server struct {
 
 var Vivos int32
 
+// anexo para tratar errores
 func failOnError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
 	}
 }
 
+// Recibe el dato de que alguien quiere jugar
 func (s *Server) QuieroJugar(ctx context.Context, empty *pb.Empty) (*pb.Jugador, error) {
 	Vivos += 1
 	/* for Vivos < 15 {
@@ -33,8 +35,9 @@ func (s *Server) QuieroJugar(ctx context.Context, empty *pb.Empty) (*pb.Jugador,
 	return &pb.Jugador{NumJug: int32(Vivos)}, nil
 }
 
+// Envia al pozo el jugador eliminado
 func sendJugadorEliminadoPozo(nJugador int, nRonda int) {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@10.6.40.230:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -65,9 +68,10 @@ func sendJugadorEliminadoPozo(nJugador int, nRonda int) {
 	log.Printf(" [x] Sent %s", body)
 }
 
+// Envia los datos de la jugada a los Nodes
 func enviarDatosJugada(nJug int, nRonda int, nJugada int) {
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":9001", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.6.40.232:9001", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("No se conecta con el nameNode: %s", err)
 	}
@@ -81,6 +85,7 @@ func enviarDatosJugada(nJug int, nRonda int, nJugada int) {
 	_ = response
 }
 
+// Anexo para obtener la ronda de la etapa 1
 func getEstadoEtapa1(r1 int, r2 int, r3 int, r4 int) (int, int) {
 	suma := r1 + r2 + r3 + r4
 	if r1 == 0 {
@@ -96,9 +101,10 @@ func getEstadoEtapa1(r1 int, r2 int, r3 int, r4 int) (int, int) {
 	}
 }
 
+// obtiene el historial del jugador desde los Nodes
 func getHistorialJugador(nJug int) (int, int, int, int, int, int, int) {
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":9001", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.6.40.232:9001", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("No se conecta con el nameNode: %s", err)
 	}
@@ -113,6 +119,7 @@ func getHistorialJugador(nJug int) (int, int, int, int, int, int, int) {
 	return int(response.Jugador), int(response.Ronda1), int(response.Ronda2), int(response.Ronda3), int(response.Ronda4), int(response.Etapa2), int(response.Etapa3)
 }
 
+// Interfaz para la etapa 1, maneja los llamados de los jugadores
 func (s *Server) Etapa1(ctx context.Context, jugadorEtapa1 *pb.JugadorEtapa1) (*pb.EstadoEtapa1, error) {
 	nEsc := int(jugadorEtapa1.EscogidoJugador)
 	numJug := int(jugadorEtapa1.NumJug)
@@ -149,6 +156,7 @@ func (s *Server) Etapa1(ctx context.Context, jugadorEtapa1 *pb.JugadorEtapa1) (*
 	return &pb.EstadoEtapa1{Vivo: alive, EscogidoLider: int32(nLider), Win: win, Round: int32(nRonda)}, nil
 }
 
+// Main, basicamente corre todo
 func main() {
 
 	fmt.Println("Soy el Lider!")

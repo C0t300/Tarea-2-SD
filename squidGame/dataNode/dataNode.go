@@ -18,6 +18,7 @@ type Server struct {
 	pb.UnimplementedDataNodeServer
 }
 
+/*Crear un archivo*/
 func createFile(nombreArchivo string) {
 	myfile, err := os.Create(nombreArchivo)
 	if err != nil {
@@ -27,6 +28,7 @@ func createFile(nombreArchivo string) {
 	myfile.Close()
 }
 
+/*Anexar contenido al archivo*/
 func appendToFile(text string, nombreArchivo string) {
 	f, err := os.OpenFile(nombreArchivo, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
@@ -40,6 +42,7 @@ func appendToFile(text string, nombreArchivo string) {
 	}
 }
 
+/*Revisar si el archivo existe*/
 func fileExists(nombreArchivo string) bool {
 	if _, err := os.Stat(nombreArchivo); err == nil {
 		return true
@@ -54,6 +57,7 @@ func fileExists(nombreArchivo string) bool {
 	}
 }
 
+/*Lectura de Archivos*/
 func readFile(nombreArchivo string) []string {
 	if fileExists(nombreArchivo) {
 		content, err := os.ReadFile(nombreArchivo)
@@ -72,6 +76,8 @@ func readFile(nombreArchivo string) []string {
 	return []string{}
 }
 
+/*GuardarDatos: Funcion que recibe un mensaje JugadaDataNote para luego crear y escribir el archivo respectivo
+al jugador y la etapa con la información de sus jugadas.*/
 func (s *Server) GuardarDatos(ctx context.Context, jugadaDataNode *pb.JugadaDataNode) (*pb.Empty, error) {
 	nJug := strconv.Itoa(int(jugadaDataNode.Jugador))
 	nRon := strconv.Itoa(int(jugadaDataNode.Ronda))
@@ -105,6 +111,8 @@ func (s *Server) GuardarDatos(ctx context.Context, jugadaDataNode *pb.JugadaData
 	return &pb.Empty{}, nil
 }
 
+/*Pedir Datos: funcion que recibe un mensaje JugadorEtapa y lee el archivo relacionado a ese jugador y etapa
+retorna un mensaje de HistorialJugadas con la info relacionada a esa etapa*/
 func (s *Server) PedirDatos(ctx context.Context, jugadorEtapa *pb.JugadorEtapa) (*pb.HistorialJugadas, error) {
 	fmt.Println("ENtrango pedir datos")
 	nJug := strconv.Itoa(int(jugadorEtapa.Jugador))
