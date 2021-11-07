@@ -41,57 +41,53 @@ func (s *Server) GuardarDatos(ctx context.Context, jugadaDataNode *pb.JugadaData
 	return &pb.Empty{}, nil
 }
 
-func (s *Server) PedirDatos(ctx context.Context, jugadorEtapa *pb.Jugador) (*pb.HistorialJugadas, error) {
+func (s *Server) PedirDatos(ctx context.Context, jugadorEtapa *pb.JugadorEtapa) (*pb.HistorialJugadas, error) {
 	nJug := strconv.Itoa(int(jugadorEtapa.NumJug))
 	nj := int(jugadorEtapa.NumJug)
-	//nEta := strconv.Itoa(int(jugadorEtapa.Etapa))
+	nEta := strconv.Itoa(int(jugadorEtapa.Etapa))
 	etapa1 := []int32{0, 0, 0, 0}
 	etapa2 := int(0)
 	etapa3 := int(0)
 	i := int(1)
-	for i < 4 {
-		etapa := strconv.Itoa(int(i))
-		nomArch := ("jugador_") + nJug + ("__ronda_") + etapa
-		f, err := os.Create(nomArch + ".txt")
+	nomArch := ("jugador_") + nJug + ("__ronda_") + nEta
+	f, err := os.Create(nomArch + ".txt")
 
-		if err != nil {
-			log.Fatal(err)
-		}
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		defer f.Close()
+	defer f.Close()
 
-		scanner := bufio.NewScanner(f)
-		cont := int(0)
-		for scanner.Scan() {
-			jugada := scanner.Text()
-			nume := strings.Fields(jugada)
-			if etapa == "1" {
-				i1, err := strconv.Atoi(nume[0])
-				if err == nil {
-					fmt.Println(i1)
-				}
-				etapa1[cont] = int32(i1)
-				cont = cont + 1
-			} else if etapa == "2" {
-				i2, err := strconv.Atoi(nume[0])
-				if err == nil {
-					fmt.Println(i2)
-				}
-				etapa2 = i2
-			} else {
-				i3, err := strconv.Atoi(nume[0])
-				if err == nil {
-					fmt.Println(i3)
-				}
-				etapa3 = i3
+	scanner := bufio.NewScanner(f)
+	cont := int(0)
+	for scanner.Scan() {
+		jugada := scanner.Text()
+		nume := strings.Fields(jugada)
+		if nEta == "1" {
+			i1, err := strconv.Atoi(nume[0])
+			if err == nil {
+				fmt.Println(i1)
 			}
-
+			etapa1[cont] = int32(i1)
+			cont = cont + 1
+		} else if nEta == "2" {
+			i2, err := strconv.Atoi(nume[0])
+			if err == nil {
+				fmt.Println(i2)
+			}
+			etapa2 = i2
+		} else {
+			i3, err := strconv.Atoi(nume[0])
+			if err == nil {
+				fmt.Println(i3)
+			}
+			etapa3 = i3
 		}
 
-		if err := scanner.Err(); err != nil {
-			log.Fatal(err)
-		}
+	}
 
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
 	}
 
 	return &pb.HistorialJugadas{Jugador: int32(nj), Ronda1: int32(etapa1[0]), Ronda2: int32(etapa1[1]), Ronda3: int32(etapa1[2]), Ronda4: int32(etapa1[3]), Etapa2: int32(etapa2), Etapa3: int32(etapa3)}, nil

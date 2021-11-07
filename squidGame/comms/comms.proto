@@ -64,5 +64,5 @@ service Pozo {
 
 service DataNode {
   rpc GuardarDatos(JugadaDataNode) returns (Empty) {}
-  rpc PedirDatos(Jugador) returns (HistorialJugadas) {}
+  rpc PedirDatos(JugadorEtapa) returns (HistorialJugadas) {}
 }

@@ -73,22 +73,47 @@ func (s *Server) Jugada(ctx context.Context, jugadaDataNode *pb.JugadaDataNode) 
 	return &pb.Empty{}, nil
 }
 
-func (s *Server) HistorialJugador(ctx context.Context, jugador *pb.Jugador) (pb.HistorialJugadas, error) {
-
+func (s *Server) HistorialJugador(ctx context.Context, jugador *pb.Jugador) (*pb.HistorialJugadas, error) {
+	var ronda1 *pb.HistorialJugadas
 	/* var ronda2 pb.HistorialJugadas
 	var ronda3 pb.HistorialJugadas */
 
-	ronda1, err := dn1.PedirDatos(context.Background(), jugador)
+	/* ronda1, err := dn1.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 1})
 	if err != nil {
 		log.Fatalf("Error when calling PedirDatos: %s", err)
 	}
+	ronda2, err := dn2.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 2})
+	if err != nil {
+		log.Fatalf("Error when calling PedirDatos: %s", err)
+	}
+	ronda3, err := dn3.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 3})
+	if err != nil {
+		log.Fatalf("Error when calling PedirDatos: %s", err)
+	} */
 
-	/* if enLista(int(jugador.NumJug), 1, l1) {
-		ronda1, err = dn1.PedirDatos(context.Background(), &pb.Jugador{NumJug: int(jugador.NumJug)})
+	if enLista(int(jugador.NumJug), 1, l1) {
+		ronda1, _ = dn1.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 1})
 	} else if enLista(int(jugador.NumJug), 1, l2) {
-		ronda2, err = dn2.PedirDatos(context.Background(), &pb.Jugador{NumJug: int(jugador.NumJug)})
+		ronda1, _ = dn2.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 1})
+	} else {
+		ronda1, _ = dn3.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 1})
+	}
+	/* if enLista(int(jugador.NumJug), 1, l1) {
+		ronda1, err = dn1.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 2})
+	} else if enLista(int(jugador.NumJug), 1, l2) {
+		ronda1, err = dn2.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 2})
 	} else if enLista(int(jugador.NumJug), 1, l3) {
-		ronda3, err = dn3.PedirDatos(context.Background(), &pb.Jugador{NumJug: int(jugador.NumJug)})
+		ronda1, err = dn3.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 2})
+	} else {
+		fmt.Println("Error 12039784")
+	}
+
+	if enLista(int(jugador.NumJug), 1, l1) {
+		ronda1, err = dn1.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 3})
+	} else if enLista(int(jugador.NumJug), 1, l2) {
+		ronda1, err = dn2.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 3})
+	} else if enLista(int(jugador.NumJug), 1, l3) {
+		ronda1, err = dn3.PedirDatos(context.Background(), &pb.JugadorEtapa{Jugador: jugador.NumJug, Etapa: 3})
 	} else {
 		fmt.Println("Error 12039784")
 	} */
@@ -102,7 +127,7 @@ func (s *Server) HistorialJugador(ctx context.Context, jugador *pb.Jugador) (pb.
 		int32 etapa3=7;
 	  } */
 
-	return *ronda1, nil
+	return &pb.HistorialJugadas{Jugador: int32(jugador.NumJug), Ronda1: int32(ronda1.Ronda1), Ronda2: int32(ronda1.Ronda2), Ronda3: int32(ronda1.Ronda3), Ronda4: int32(ronda1.Ronda4), Etapa2: 0, Etapa3: 0}, nil
 }
 
 func connectGRPC(puerto string) pb.DataNodeClient {
