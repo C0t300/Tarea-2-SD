@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
@@ -128,10 +129,15 @@ func (s *Server) PedirDatos(ctx context.Context, jugadorEtapa *pb.JugadorEtapa) 
 		fmt.Println("laskdjlkdj no existe el archivo")
 	}
 	if nEta == "1" {
-		buf1 := readFile(nomArch)
+		file, err := os.Open(nomArch)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+		buf1 := bufio.NewScanner(file)
 		i := 0
-		for i < len(buf1) {
-			buf, err := strconv.Atoi(string(buf1[i]))
+		for buf1.Scan() {
+			buf, err := strconv.Atoi(buf1.Text())
 			if err != nil {
 				log.Fatalf("error añslkjdaslkj: %s", err)
 			}
