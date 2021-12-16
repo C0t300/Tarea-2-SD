@@ -128,10 +128,10 @@ func (s *Server) PedirDatos(ctx context.Context, jugadorEtapa *pb.JugadorEtapa) 
 		fmt.Println("laskdjlkdj no existe el archivo")
 	}
 	if nEta == "1" {
-		readFile(nomArch)
+		buf1 := readFile(nomArch)
 		i := 0
-		for i < len(nomArch) {
-			buf, err := strconv.Atoi(string(nomArch[i]))
+		for i < len(buf1) {
+			buf, err := strconv.Atoi(string(buf1[i]))
 			if err != nil {
 				log.Fatalf("error añslkjdaslkj: %s", err)
 			}
