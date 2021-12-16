@@ -1,4 +1,4 @@
-run89: runp rund
+run89: rund runp 
 
 run90:	rund runl
 
@@ -11,7 +11,7 @@ runj:
 	go run squidGame/jugador/jugador.go
 
 rund:
-	go run squidGame/dataNode/dataNode.go
+	go run squidGame/dataNode/dataNode.go &
 
 runl:
 	go run squidGame/lider/lider.go
